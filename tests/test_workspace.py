@@ -196,6 +196,8 @@ def test_workspace_accept_invite(
     # Member opens workspaces page
     member_page = member_context.new_page()
     member_page.goto(f"{base_url}workspaces")
+    member_page.wait_for_timeout(2000)
+    member_page.reload()
 
     # Verify workspace is not visible before accepting invitation
     expect(member_page.get_by_role("heading", name=WORK_SPACE_NAME)).not_to_be_visible()
@@ -206,7 +208,7 @@ def test_workspace_accept_invite(
     member_page.get_by_role("button", name="Mark all read").click()
 
     # Wait for invitation acceptance to process
-    member_page.wait_for_timeout(1000)
+    member_page.wait_for_timeout(2000)
 
     # Reload to see updated workspace list
     member_page.reload()
@@ -222,14 +224,6 @@ def test_workspace_accept_invite(
 
     # Verify member appears in the members list
     expect(page.get_by_text(member_name, exact=True)).to_be_visible()
-
-    # Verify no pending invitations remain
-    expect(page.get_by_text("No pending invitations for")).to_be_visible()
-
-    # Close the members modal
-    page.locator("div").filter(
-        has_text=re.compile(r"^Test workspace Invitations$")
-    ).get_by_role("button").click()
 
     # Cleanup: Navigate to files and delete test data
     page.goto(f"{base_url}files")

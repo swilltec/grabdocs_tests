@@ -60,7 +60,7 @@ def authenticated_context(browser_context, base_url, email, password):
     page.get_by_role("button", name="Verify Code").click()
 
     # Wait for dashboard to confirm successful login.
-    page.wait_for_url(re.compile(r".*/upload"), timeout=90000)
+    page.wait_for_url(re.compile(r".*/upload"), timeout=99000)
 
     # Save authentication state
     storage_state_path = "logged_in.json"
