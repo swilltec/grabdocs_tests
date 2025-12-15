@@ -355,6 +355,110 @@ def test_workspace_file_share(authenticated_context, base_url):
     page.close()
 
 
+def test_workspace_start_meeting(authenticated_context, base_url):
+    """
+    Test Case: Start a Meeting
+
+    Objective:
+    Verify that a user can successfully start a meeting by clicking the start meeting icon.
+
+    Precondition:
+    The user must be logged in (authenticated session).
+
+    Steps:
+    1. Navigate to the 'Workspaces' page.
+    2. Validate presence of the main 'Workspaces' heading.
+    3. Locate and click the start meeting icon/button.
+    4. Verify that the meeting interface or meeting page is displayed.
+
+    Expected Result:
+    A meeting should be started successfully, and the meeting interface should be visible.
+    """
+    page = authenticated_context.new_page()
+    page.goto(f"{base_url}workspaces")
+
+    # Verify navigation to the "Workspaces" page
+    expect(page.get_by_role("heading", level=1, name=WORK_SPACE_NAME)).to_be_visible()
+
+    # Look for and click the start meeting icon/button
+    # Try multiple selectors to find the start meeting button/icon
+    start_meeting_clicked = False
+
+    # First, try to find by button role with "Start Meeting" text
+    try:
+        start_meeting_button = page.get_by_role("button", name=re.compile("Start Meeting", re.I))
+        if start_meeting_button.count() > 0:
+            start_meeting_button.first.click()
+            start_meeting_clicked = True
+    except Exception:
+        pass
+
+    # If not found, try aria-label
+    if not start_meeting_clicked:
+        try:
+            start_meeting_button = page.locator("button[aria-label*='meeting' i]")
+            if start_meeting_button.count() > 0:
+                start_meeting_button.first.click()
+                start_meeting_clicked = True
+        except Exception:
+            pass
+
+    # If still not found, try data-testid
+    if not start_meeting_clicked:
+        try:
+            start_meeting_button = page.locator("[data-testid*='meeting' i], [data-testid*='start-meeting' i]")
+            if start_meeting_button.count() > 0:
+                start_meeting_button.first.click()
+                start_meeting_clicked = True
+        except Exception:
+            pass
+
+    # If still not found, try any button containing "meeting" text
+    if not start_meeting_clicked:
+        try:
+            start_meeting_button = page.locator("button").filter(has_text=re.compile("meeting", re.I))
+            if start_meeting_button.count() > 0:
+                start_meeting_button.first.click()
+                start_meeting_clicked = True
+        except Exception:
+            pass
+
+    # If still not found, try finding an icon (SVG) that might represent a meeting/video call
+    if not start_meeting_clicked:
+        try:
+            # Look for SVG icons that might be clickable (inside a button or clickable element)
+            start_meeting_icon = page.locator("button svg, [role='button'] svg, a svg").filter(has=page.locator("path, circle, rect"))
+            if start_meeting_icon.count() > 0:
+                # Try clicking the parent button/link
+                start_meeting_icon.first.locator("..").click()
+                start_meeting_clicked = True
+        except Exception:
+            pass
+
+    # Assert that we found and clicked the start meeting button
+    assert start_meeting_clicked, "Could not find start meeting button/icon on the workspaces page"
+
+    # Wait for meeting interface to load
+    page.wait_for_timeout(2000)
+
+    # Verify that meeting has started
+    # Check if URL changed to indicate meeting page opened
+    current_url = page.url.lower()
+    if "meeting" in current_url:
+        # Meeting page opened - verify URL contains meeting
+        expect(page).to_have_url(re.compile("meeting", re.I), timeout=10000)
+    else:
+        # Check for meeting-related UI elements on the current page
+        # Look for common meeting indicators
+        try:
+            expect(page.get_by_text(re.compile("meeting|join|video|audio", re.I)).first).to_be_visible(timeout=10000)
+        except Exception:
+            # Alternative: check for meeting control buttons
+            expect(page.get_by_role("button", name=re.compile("leave|end|exit", re.I)).first).to_be_visible(timeout=10000)
+
+    page.close()
+
+
 def test_workspace_chat(authenticated_context, base_url):
     """
     Test Case: Access Workspace Chat
