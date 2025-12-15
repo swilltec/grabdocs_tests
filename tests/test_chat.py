@@ -79,7 +79,9 @@ def test_file_download(authenticated_context, base_url):
         page.get_by_role("button", name="Download").click()
 
     download = download_info.value
-    assert download.suggested_filename.endswith(".pdf"), "Downloaded file should be a PDF"
+    assert download.suggested_filename.endswith(
+        ".pdf"
+    ), "Downloaded file should be a PDF"
 
     page.close()
 
