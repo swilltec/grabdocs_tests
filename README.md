@@ -16,6 +16,7 @@ Tests are implemented using **Python**, **Pytest**, and **Playwright** to valida
     ├── conftest.py                # Pytest fixtures (setup, authentication)
     ├── test_auth.py               # Authentication and session tests
     ├── test_chat.py               # Chat-related test cases
+    ├── test_files.py              # Files related test cases
     └── test_workspace.py          # Workspace creation and deletion tests
 ```
 
@@ -25,7 +26,7 @@ Tests are implemented using **Python**, **Pytest**, and **Playwright** to valida
 
 ### 1. Clone the Repository
 ```bash
-git clone git@github.com:swilltec/grabdocs_tests.git
+git clone https://github.com/queendebra92/grabdocs_tests
 cd grabdocs-tests
 ```
 
